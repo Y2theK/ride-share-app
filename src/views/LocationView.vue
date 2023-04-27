@@ -29,7 +29,20 @@
   </div>
 </template>
 <script setup>
+import { useLocationStore } from "@/stores/location";
+const location = useLocationStore();
 const handleLocationChanged = (e) => {
   console.log(e);
+
+  location.$patch({
+    destination: {
+      name: e.name,
+      address: e.formatted_address,
+      geometry: {
+        lat: e.geometry.location.lat(),
+        lng: e.geometry.location.lng(),
+      },
+    },
+  });
 };
 </script>
