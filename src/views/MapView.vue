@@ -36,6 +36,7 @@
 </template>
 <script setup>
 import { useLocationStore } from "@/stores/location";
+import axios from "axios";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 
@@ -79,4 +80,21 @@ onMounted(async () => {
     );
   });
 });
+
+const handleConfirmTrip = () => {
+  axios
+    .post(`${import.meta.env.VITE_APP_BASE_URL}/trip`, {
+      origin: location.current.geometry,
+      destination: location.destination.geometry,
+      destination_name: location.destination.name,
+    })
+    .then((response) => {
+      router.push({
+        name: "trip",
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
 </script>
