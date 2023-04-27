@@ -30,10 +30,12 @@
 </template>
 <script setup>
 import { useLocationStore } from "@/stores/location";
+import { useRouter } from "vue-router";
+const router = useRouter();
 const location = useLocationStore();
 const handleLocationChanged = (e) => {
   console.log(e);
-
+  //update location store destination attr
   location.$patch({
     destination: {
       name: e.name,
@@ -44,5 +46,12 @@ const handleLocationChanged = (e) => {
       },
     },
   });
+};
+const handleSelectLocation = () => {
+  if (location.destination.name !== "") {
+    router.push({
+      name: "map",
+    });
+  }
 };
 </script>
