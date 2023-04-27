@@ -1,10 +1,9 @@
 import { createApp } from "vue";
+import VueGoogleMaps from "@fawmi/vue-google-maps";
 import { createPinia } from "pinia";
 
 import App from "./App.vue";
 import router from "./router";
-
-import VueGoogleMaps from "@fawmi/vue-google-maps";
 
 import "./assets/main.css";
 
@@ -15,8 +14,8 @@ app.use(router);
 
 app.use(VueGoogleMaps, {
   load: {
-    key: "AIzaSyBDNgLXxMAMvQkDkniyzJ2bGip7-2XKI4Y",
+    key: "AIzaSyCAqdwRPpTtDGc6lWZKlSO0EPgkAKRo-8o",
+    libraries: "places",
   },
 });
-
 app.mount("#app");
