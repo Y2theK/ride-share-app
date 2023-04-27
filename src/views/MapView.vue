@@ -81,9 +81,10 @@ onMounted(async () => {
   });
 });
 
+import http from "@/helpers/http.js";
 const handleConfirmTrip = () => {
-  axios
-    .post(`${import.meta.env.VITE_APP_BASE_URL}/trip`, {
+  http()
+    .post("/trip", {
       origin: location.current.geometry,
       destination: location.destination.geometry,
       destination_name: location.destination.name,
