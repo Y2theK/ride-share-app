@@ -9,6 +9,8 @@
           <div>
             <input
               type="text"
+              v-maska
+              data-maska="## # ######### "
               name="phone"
               id="phone"
               placeholder="1 (234) 567-8910"
@@ -29,4 +31,5 @@
   </div>
 </template>
 <script setup>
+import { vMaska } from "maska";
 </script>
