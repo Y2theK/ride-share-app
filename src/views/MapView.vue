@@ -8,7 +8,9 @@
         <div class="bg-white px-4 py-5 sm:p-6">
           <div>
             <GMapMap
+              v-if="location.destination.name !== ''"
               :zoom="11"
+              ref="gMap"
               :center="location.destination.geometry"
               style="width: 100%; height: 256px"
             >
@@ -34,11 +36,12 @@
 </template>
 <script setup>
 import { useLocationStore } from "@/stores/location";
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 
 const location = useLocationStore();
 const router = useRouter();
+const gMap = ref(null);
 
 onMounted(async () => {
   if (location.destination.name === "") {
@@ -49,5 +52,31 @@ onMounted(async () => {
 
   //let get user current location and update current in store
   await location.updateCurrentLocation();
+
+  // draw a path on the map
+  gMap.value.$mapPromise.then((mapObject) => {
+    let currentPoint = new google.maps.LatLng(location.current.geometry),
+      destinationPoint = new google.maps.LatLng(location.destination.geometry),
+      directionsService = new google.maps.DirectionsService(),
+      directionsDisplay = new google.maps.DirectionsRenderer({
+        map: mapObject,
+      });
+    directionsService.route(
+      {
+        origin: currentPoint,
+        destination: destinationPoint,
+        avoidTolls: false,
+        avoidHighways: false,
+        travelMode: google.maps.TravelMode.DRIVING,
+      },
+      (res, status) => {
+        if (status === google.maps.DirectionsStatus.OK) {
+          directionsDisplay.setDirections(res);
+        } else {
+          console.error(status);
+        }
+      }
+    );
+  });
 });
 </script>
