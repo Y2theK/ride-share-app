@@ -25,5 +25,4 @@ const title = ref("Waiting on a driver...");
 const message = ref(
   "When a driver accepts the trip, their info will appear here."
 );
-const gMap = ref(null);
 </script>
