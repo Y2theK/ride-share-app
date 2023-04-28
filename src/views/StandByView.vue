@@ -107,6 +107,7 @@ const handleDeclineTrip = () => {
   trip.reset();
   title.value = "Waiting for ride request...";
 };
+
 const initMapDirection = () => {
   // draw a path on the map
   gMap.value.$mapPromise.then((mapObject) => {

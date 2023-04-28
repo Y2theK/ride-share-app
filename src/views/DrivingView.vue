@@ -71,4 +71,28 @@ const destinationIcon = {
     height: 24,
   },
 };
+
+//map bound betweeen driver location and pessenger location
+const updateMapBounds = (mapObject) => {
+  let originPoint = new google.maps.LatLng(location.current.geometry),
+    destinationPoint = new google.maps.LatLng(location.destination.geometry),
+    latLngBounds = new google.maps.LatLngBounds();
+  latLngBounds.extend(originPoint);
+  latLngBounds.extend(destinationPoint);
+  mapObject.fitBounds(latLngBounds);
+};
+
+onMounted(() => {
+  gMap.value.$mapPromise.then((mapObject) => {
+    updateMapBounds(mapObject);
+
+    //update driver current llcation and MapBound in each 5 sec
+
+    setInterval(async () => {
+      await location.updateCurrentLocation();
+
+      updateMapBounds(mapObject);
+    }, 5000);
+  });
+});
 </script>
