@@ -50,10 +50,16 @@ import Pusher from "pusher-js";
 import Loader from "@/components/Loader.vue";
 import { onMounted, ref } from "vue";
 import { useTripStore } from "@/stores/trip";
+import { useLocationStore } from "@/stores/location";
+
+import http from "@/helpers/http.js";
+import { useRouter } from "vue-router";
 const title = ref("Waiting for ride request...");
+const router = useRouter();
 const trip = useTripStore();
+const location = useLocationStore();
 const gMap = ref(null);
-onMounted(() => {
+onMounted(async () => {
   let echo = new Echo({
     broadcaster: "pusher",
     key: "mykey",
@@ -72,8 +78,31 @@ onMounted(() => {
     // initMapDirection();
     setTimeout(initMapDirection, 2000); //since it has some delay
   });
-});
 
+  await location.updateCurrentLocation();
+});
+const handleAcceptTrip = () => {
+  http()
+    .post(`/trip/${trip.id}/accept`, {
+      driver_location: location.current.geometry,
+    })
+    .then((response) => {
+      console.log(response);
+      location.$patch({
+        destination: {
+          name: "Passenger",
+          geometry: response.data.origin,
+        },
+      });
+
+      router.push({
+        name: "driving",
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
 const handleDeclineTrip = () => {
   trip.reset();
   title.value = "Waiting for ride request...";
