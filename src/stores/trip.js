@@ -15,5 +15,15 @@ export const useTripStore = defineStore("trip", () => {
     lng: null,
   });
 
-  return { id, user_id, destination_name, origin, destination };
+  const reset = () => {
+    id.value = null;
+    user_id.value = null;
+    destination_name.value = "";
+    origin.lat = null;
+    origin.lng = null;
+    destination.lat = null;
+    destination.lng = null;
+  };
+
+  return { id, user_id, destination_name, origin, destination, reset };
 });

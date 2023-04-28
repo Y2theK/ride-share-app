@@ -67,11 +67,17 @@ onMounted(() => {
 
   echo.channel("drivers").listen("TripCreated", (e) => {
     console.log("trip created", e);
+    trip.value = "Ride Requested";
     trip.$patch(e.trip);
-    initMapDirection();
-    // setTimeout(initMapDirection, 2000);
+    // initMapDirection();
+    setTimeout(initMapDirection, 2000); //since it has some delay
   });
 });
+
+const handleDeclineTrip = () => {
+  trip.reset();
+  title.value = "Waiting for ride request...";
+};
 const initMapDirection = () => {
   // draw a path on the map
   gMap.value.$mapPromise.then((mapObject) => {
