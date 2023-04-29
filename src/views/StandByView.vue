@@ -62,8 +62,8 @@ const gMap = ref(null);
 onMounted(async () => {
   let echo = new Echo({
     broadcaster: "pusher",
-    key: "mykey",
-    cluster: "mt1",
+    key: import.meta.env.VITE_PUSHER_APP_KEY,
+    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
     wsHost: window.location.hostname,
     wsPort: 6001,
     forceTLS: false,

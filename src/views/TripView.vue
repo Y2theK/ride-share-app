@@ -35,12 +35,14 @@ import { useLocationStore } from "@/stores/location";
 import { useTripStore } from "@/stores/trip";
 import Echo from "laravel-echo";
 import Pusher from "pusher-js";
+import { useRouter } from "vue-router";
 
 const location = useLocationStore();
 const trip = useTripStore();
 const title = ref("Waiting on a driver...");
 const gMap = ref(null);
 const gMapObject = ref(null);
+const router = useRouter();
 const message = ref(
   "When a driver accepts the trip, their info will appear here."
 );
@@ -74,8 +76,8 @@ onMounted(() => {
 
   let echo = new Echo({
     broadcaster: "pusher",
-    key: "mykey",
-    cluster: "mt1",
+    key: import.meta.env.VITE_PUSHER_APP_KEY,
+    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
     wsHost: window.location.hostname,
     wsPort: 6001,
     forceTLS: false,
