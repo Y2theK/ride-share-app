@@ -17,11 +17,7 @@
                 :position="location.current.geometry"
                 :icon="currentIcon"
               />
-              <GMapMarker
-                v-if="trip.driver_location"
-                :position="trip.driver_location"
-                :icon="DriverIcon"
-              />
+              <GMapMarker :position="trip.driver_location" :icon="DriverIcon" />
             </GMapMap>
           </div>
         </div>
@@ -100,6 +96,32 @@ onMounted(() => {
       console.log("TripLocationUpdated", e);
       trip.$patch(e.trip);
       setTimeout(updateMapBounds, 1000);
+    })
+    .listen("TripStarted", (e) => {
+      console.log("TripStarted", e);
+      trip.$patch(e.trip);
+      title.value = "You're on your way!";
+      message.value = `You are headed to ${e.trip.destination_name}`;
+
+      location.$patch({
+        current: {
+          geometry: e.trip.destination,
+        },
+      });
+    })
+    .listen("TripCompleted", (e) => {
+      console.log("TripCompleted", e);
+      trip.$patch(e.trip);
+      title.value = "You've arrived!";
+      message.value = `Hope you enjoyed your ride with ${e.trip.driver.user.name}`;
+      setTimeout(() => {
+        trip.reset();
+        location.reset();
+
+        router.push({
+          name: "landing",
+        });
+      }, 10000);
     });
 });
 </script>

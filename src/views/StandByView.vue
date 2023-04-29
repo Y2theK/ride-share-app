@@ -88,6 +88,7 @@ const handleAcceptTrip = () => {
     })
     .then((response) => {
       console.log(response);
+      // trip.$patch(response.data);
       location.$patch({
         destination: {
           name: "Passenger",

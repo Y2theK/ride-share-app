@@ -4,6 +4,7 @@
     <div>
       <div
         class="overflow-hidden shadow sm:rounded-md max-w-sm mx-auto text-left"
+        v-if="!trip.is_completed"
       >
         <div class="bg-white px-4 py-5 sm:p-6">
           <div>
@@ -44,10 +45,19 @@
           </button>
         </div>
       </div>
+      <div
+        class="overflow-hidden shadow sm:rounded-md max-w-sm mx-auto text-left"
+        v-else
+      >
+        <div class="bg-white px-4 py-5 sm:p-6">
+          <Tada />
+        </div>
+      </div>
     </div>
   </div>
 </template>
 <script setup>
+import Tada from "@/components/Tada.vue";
 import { useLocationStore } from "@/stores/location";
 import { useTripStore } from "@/stores/trip";
 import { useRouter } from "vue-router";
