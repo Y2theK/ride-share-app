@@ -31,6 +31,14 @@ export const useLocationStore = defineStore("location", () => {
       lng: userLocation.coords.longitude,
     };
   };
+  const reset = () => {
+    destination.name = "";
+    destination.address = "";
+    destination.geometry.lat = null;
+    destination.geometry.lng = null;
 
-  return { current, destination, updateCurrentLocation };
+    current.geometry.lat = null;
+    current.geometry.lng = null;
+  };
+  return { current, destination, updateCurrentLocation, reset };
 });

@@ -73,7 +73,46 @@ const destinationIcon = {
     height: 24,
   },
 };
+const handlePassengerPickedUp = () => {
+  http()
+    .post(`/trip/${trip.id}/start`)
+    .then((response) => {
+      title.value = "Travelling to destination";
+      location.$patch({
+        destination: {
+          geometry: response.data.destination,
+          name: response.data.destination_name,
+        },
+      });
 
+      trip.$patch(response.data);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+const handleCompleteTrip = () => {
+  http()
+    .post(`/trip/${trip.id}/end`)
+    .then((response) => {
+      title.value = "Completed Trip";
+
+      trip.$patch(response.data);
+
+      //reset trip and location after 3 sec of completing trip
+      setTimeout(() => {
+        trip.reset();
+        location.reset();
+        router.push({
+          name: "standby",
+        });
+      }, 3000);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
 //map bound betweeen driver location and pessenger location
 const updateMapBounds = (mapObject) => {
   let originPoint = new google.maps.LatLng(location.current.geometry),
