@@ -27,7 +27,7 @@
             <p class="text-xl">Going to <strong>pick up a passenger</strong></p>
           </div>
         </div>
-        <!-- <div class="bg-gray-50 px-4 py-3 text-right sm:px-6">
+        <div class="bg-gray-50 px-4 py-3 text-right sm:px-6">
           <button
             v-if="trip.is_started"
             @click="handleCompleteTrip"
@@ -42,7 +42,7 @@
           >
             Passenger Picked Up
           </button>
-        </div> -->
+        </div>
       </div>
     </div>
   </div>
@@ -52,11 +52,13 @@ import { useLocationStore } from "@/stores/location";
 import { useTripStore } from "@/stores/trip";
 import { useRouter } from "vue-router";
 import { ref, onMounted, onUnmounted } from "vue";
+import http from "@/helpers/http";
 const location = useLocationStore();
 const trip = useTripStore();
 const router = useRouter();
 const gMap = ref(null);
 const title = ref("Driving to passenger...");
+const intervelRef = ref(null);
 const currentIcon = {
   url: "https://openmoji.org/data/color/svg/1F698.svg",
   scaledSize: {
@@ -81,18 +83,36 @@ const updateMapBounds = (mapObject) => {
   latLngBounds.extend(destinationPoint);
   mapObject.fitBounds(latLngBounds);
 };
+const broadcastDriverLocation = () => {
+  http()
+    .post(`/trip/${trip.id}/location`, {
+      driver_location: location.current.geometry,
+    })
+    .then((response) => {})
+    .catch((error) => {
+      console.log(error);
+    });
+};
 
 onMounted(() => {
   gMap.value.$mapPromise.then((mapObject) => {
     updateMapBounds(mapObject);
 
-    //update driver current llcation and MapBound in each 5 sec
-
-    setInterval(async () => {
+    //update driver current llcation in store and MapBound in each 5 sec
+    intervelRef.value = setInterval(async () => {
       await location.updateCurrentLocation();
+
+      //update driver location in database
+      broadcastDriverLocation();
 
       updateMapBounds(mapObject);
     }, 5000);
   });
+});
+
+onUnmounted(() => {
+  //clear interval
+  clearInterval(intervelRef.value);
+  intervelRef.value = null;
 });
 </script>
