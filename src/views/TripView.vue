@@ -10,13 +10,18 @@
             <GMapMap
               :zoom="14"
               :center="location.current.geometry"
+              ref="gMap"
               style="width: 100%; height: 256px"
             >
               <GMapMarker
                 :position="location.current.geometry"
                 :icon="currentIcon"
               />
-              <GMapMarker :position="trip.driver_location" :icon="driverIcon" />
+              <GMapMarker
+                v-if="trip.driver_location"
+                :position="trip.driver_location"
+                :icon="DriverIcon"
+              />
             </GMapMap>
           </div>
         </div>
@@ -38,6 +43,8 @@ import Pusher from "pusher-js";
 const location = useLocationStore();
 const trip = useTripStore();
 const title = ref("Waiting on a driver...");
+const gMap = ref(null);
+const gMapObject = ref(null);
 const message = ref(
   "When a driver accepts the trip, their info will appear here."
 );
@@ -55,8 +62,20 @@ const driverIcon = {
     height: 32,
   },
 };
+const updateMapBounds = () => {
+  let originPoint = new google.maps.LatLng(location.current.geometry),
+    driverPoint = new google.maps.LatLng(trip.driver_location),
+    latLngBounds = new google.maps.LatLngBounds();
+  latLngBounds.extend(originPoint);
+  latLngBounds.extend(driverPoint);
+  gMapObject.value.fitBounds(latLngBounds);
+};
 
 onMounted(() => {
+  gMap.value.$mapPromise.then((mapObject) => {
+    gMapObject.value = mapObject;
+  });
+
   let echo = new Echo({
     broadcaster: "pusher",
     key: "mykey",
@@ -68,12 +87,19 @@ onMounted(() => {
     enabledTransports: ["ws", "wss"],
   });
 
-  echo.channel(`passenger_${trip.user_id}`).listen("TripAccepted", (e) => {
-    console.log("TripAccepted", e);
-    title.value = "Driver is on the way";
-    trip.$patch(e.trip);
+  echo
+    .channel(`passenger_${trip.user_id}`)
+    .listen("TripAccepted", (e) => {
+      console.log("TripAccepted", e);
+      title.value = "Driver is on the way";
+      trip.$patch(e.trip);
 
-    message.value = e.trip.driver.user.name;
-  });
+      message.value = `${e.trip.driver.user.name} is coming in a ${e.trip.driver.year} ${e.trip.driver.color} ${e.trip.driver.make} ${e.trip.driver.model} with a license plate #${e.trip.driver.license_plate}`;
+    })
+    .listen("TripLocationUpdated", (e) => {
+      console.log("TripLocationUpdated", e);
+      trip.$patch(e.trip);
+      setTimeout(updateMapBounds, 1000);
+    });
 });
 </script>
