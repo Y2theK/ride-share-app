@@ -36,11 +36,13 @@
 </template>
 <script setup>
 import { useLocationStore } from "@/stores/location";
+import { useTripStore } from "@/stores/trip";
 import axios from "axios";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 
 const location = useLocationStore();
+const trip = useTripStore();
 const router = useRouter();
 const gMap = ref(null);
 
@@ -90,6 +92,7 @@ const handleConfirmTrip = () => {
       destination_name: location.destination.name,
     })
     .then((response) => {
+      trip.$patch(response.data);
       router.push({
         name: "trip",
       });
